@@ -1,12 +1,15 @@
 .git/
 .vscode/
 .codex
+.prettierignore
 src/
 *.vsix
 *.map
+**/*.map
 eslint.config.mjs
 tsconfig.json
 Makefile
+STATUS.md
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

@@ -1,10 +1,13 @@
 .git/**
 .gitignore
 .npmignore
+.prettierignore
 .vscode/**
 .codex
 src/**
 *.map
+**/*.map
 eslint.config.mjs
 tsconfig.json
 Makefile
+STATUS.md

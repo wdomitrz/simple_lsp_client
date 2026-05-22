@@ -19,15 +19,74 @@
   "activationEvents": [
     "onStartupFinished"
   ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "simpleLspClient.restartServers",
+        "title": "Simple LSP Client: Restart Servers"
+      }
+    ],
+    "configuration": {
+      "title": "Simple LSP Client",
+      "properties": {
+        "simpleLspClient.servers": {
+          "type": "object",
+          "default": {},
+          "markdownDescription": "Named LSP servers to start. Each key is a server name.",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "cmd",
+              "filetypes"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "cmd": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "markdownDescription": "Command and arguments used to start the LSP server over stdio."
+              },
+              "filetypes": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "markdownDescription": "VS Code language IDs this LSP server should attach to."
+              }
+            }
+          },
+          "examples": [
+            {
+              "ruff": {
+                "cmd": [
+                  "ruff",
+                  "server"
+                ],
+                "filetypes": [
+                  "python"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
   "main": "./dist/extension.js",
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "typecheck": "tsc -p ./ --noEmit",
-    "bundle": "esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --sourcemap --outfile=dist/extension.js",
+    "bundle": "esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --minify --outfile=dist/extension.js",
     "compile": "npm run typecheck && npm run bundle",
     "lint": "eslint src/**/*.ts",
-    "format": "prettier --write package.json package-lock.json tsconfig.json eslint.config.mjs .prettierrc.json src/**/*.ts",
-    "format:check": "prettier --check package.json package-lock.json tsconfig.json eslint.config.mjs .prettierrc.json src/**/*.ts",
+    "format": "prettier --write package.json package-lock.json tsconfig.json eslint.config.mjs .prettierrc.json README.md STATUS.md src/**/*.ts",
+    "format:check": "prettier --check package.json package-lock.json tsconfig.json eslint.config.mjs .prettierrc.json README.md STATUS.md src/**/*.ts",
     "test": "npm run compile",
     "package": "vsce package --no-dependencies"
   },
