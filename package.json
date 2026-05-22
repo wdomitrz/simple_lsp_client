@@ -5,15 +5,32 @@
   "version": "0.0.1",
   "private": true,
   "publisher": "local",
-  "engines": { "vscode": "^1.100.0" },
-  "categories": ["Other"],
-  "activationEvents": ["onStartupFinished"],
+  "license": "AGPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/wdomitrz/simple_lsp_client.git"
+  },
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
+  "files": [
+    "dist",
+    "LICENSE.md",
+    "package.json"
+  ],
   "scripts": {
+    "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
-    "lint": "eslint .",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write package.json package-lock.json tsconfig.json eslint.config.mjs .prettierrc.json src/**/*.ts",
+    "format:check": "prettier --check package.json package-lock.json tsconfig.json eslint.config.mjs .prettierrc.json src/**/*.ts",
     "test": "npm run compile",
     "package": "vsce package"
   },
@@ -27,5 +44,7 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.4"
   },
-  "dependencies": { "vscode-languageclient": "^9.0.1" }
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  }
 }

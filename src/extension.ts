@@ -1,6 +1,7 @@
 import type { ExtensionContext } from "vscode";
 
-export function activate(_context: ExtensionContext): void {
+export function activate(context: ExtensionContext): void {
+  void context;
   // Extension implementation will be added after the config shape is finalized.
 }
 
