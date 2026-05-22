@@ -5,4 +5,6 @@ export function activate(context: ExtensionContext): void {
   // Extension implementation will be added after the config shape is finalized.
 }
 
-export function deactivate(): void {}
+export function deactivate(): void {
+  return;
+}
