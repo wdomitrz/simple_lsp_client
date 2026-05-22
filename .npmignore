@@ -1,0 +1,13 @@
+.git/
+.vscode/
+.codex
+src/
+*.vsix
+*.map
+eslint.config.mjs
+tsconfig.json
+Makefile
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

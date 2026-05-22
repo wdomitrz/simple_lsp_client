@@ -1,6 +1,8 @@
 .git/**
+.gitignore
+.npmignore
 .vscode/**
-node_modules/**
+.codex
 src/**
 *.map
 eslint.config.mjs
