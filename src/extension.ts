@@ -15,12 +15,19 @@ import {
 } from "vscode-languageclient/node";
 
 type NonEmptyStringArray = [string, ...string[]];
+type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
 
 interface ServerConfig {
   cmd: NonEmptyStringArray;
   filetypes: NonEmptyStringArray;
   env?: Record<string, string>;
-  initializationOptions?: object;
+  initializationOptions?: JsonValue;
 }
 
 interface NamedServerConfig extends ServerConfig {
@@ -38,6 +45,7 @@ const serversConfigKey = "servers";
 
 let outputChannel: OutputChannel | undefined;
 let activeClients: ActiveClient[] = [];
+let restartQueue: Promise<void> = Promise.resolve();
 
 export function activate(context: ExtensionContext): void {
   outputChannel = window.createOutputChannel("Simple LSP Client");
@@ -48,7 +56,7 @@ export function activate(context: ExtensionContext): void {
       outputChannel?.appendLine(
         "Restart command invoked; restarting LSP clients.",
       );
-      await restartClients();
+      await queueRestart();
     }),
     commands.registerCommand("simpleLspClient.showStatus", () => {
       showStatus();
@@ -58,12 +66,12 @@ export function activate(context: ExtensionContext): void {
         outputChannel?.appendLine(
           "Configuration changed; restarting LSP clients.",
         );
-        void restartClients();
+        void queueRestart();
       }
     }),
   );
 
-  void restartClients();
+  void queueRestart();
 }
 
 export async function deactivate(): Promise<void> {
@@ -82,6 +90,11 @@ async function restartClients(): Promise<void> {
   }
 
   await Promise.all(servers.map((server) => startClient(server)));
+}
+
+function queueRestart(): Promise<void> {
+  restartQueue = restartQueue.then(restartClients, restartClients);
+  return restartQueue;
 }
 
 async function stopClients(): Promise<void> {
@@ -136,11 +149,18 @@ async function startClient(config: NamedServerConfig): Promise<void> {
     clientOptions,
   );
 
-  activeClients.push({ config, client, workspaceFolder });
   outputChannel?.appendLine(
     `Starting ${config.name}: ${config.cmd.join(" ")}${formatWorkspaceFolder(workspaceFolder)}`,
   );
-  await client.start();
+  try {
+    await client.start();
+    activeClients.push({ config, client, workspaceFolder });
+  } catch (error) {
+    outputChannel?.appendLine(
+      `Failed to start LSP client "${config.name}": ${formatError(error)}`,
+    );
+    await stopFailedClient(client, config);
+  }
 }
 
 function createDocumentSelector(
@@ -157,7 +177,16 @@ function readServerConfigs(): NamedServerConfig[] {
     .getConfiguration(configSection)
     .get<Record<string, ServerConfig>>(serversConfigKey, {});
 
-  return Object.entries(servers).map(([name, config]) => ({ name, ...config }));
+  return Object.entries(servers).flatMap(([name, config]) => {
+    if (isValidServerConfig(config)) {
+      return [{ name, ...config }];
+    }
+
+    outputChannel?.appendLine(
+      `Skipping invalid LSP server config "${name}". Expected non-empty "cmd" and "filetypes" arrays.`,
+    );
+    return [];
+  });
 }
 
 function getRootWorkspaceFolder(): WorkspaceFolder | undefined {
@@ -166,6 +195,7 @@ function getRootWorkspaceFolder(): WorkspaceFolder | undefined {
 
 function showStatus(): void {
   const channel = getOutputChannel();
+  channel.appendLine("");
   channel.appendLine("Simple LSP Client status:");
 
   if (activeClients.length === 0) {
@@ -207,6 +237,29 @@ function formatWorkspaceFolder(
 function getOutputChannel(): OutputChannel {
   outputChannel ??= window.createOutputChannel("Simple LSP Client");
   return outputChannel;
+}
+
+async function stopFailedClient(
+  client: LanguageClient,
+  config: NamedServerConfig,
+): Promise<void> {
+  try {
+    await client.stop();
+  } catch (error) {
+    outputChannel?.appendLine(
+      `Failed to clean up LSP client "${config.name}" after startup failure: ${formatError(error)}`,
+    );
+  }
+}
+
+function isValidServerConfig(config: ServerConfig): boolean {
+  return (
+    isNonEmptyStringArray(config.cmd) && isNonEmptyStringArray(config.filetypes)
+  );
+}
+
+function isNonEmptyStringArray(value: string[]): value is NonEmptyStringArray {
+  return value.length > 0 && value.every((item) => item.length > 0);
 }
 
 function formatError(error: unknown): string {

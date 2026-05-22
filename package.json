@@ -3,7 +3,6 @@
   "displayName": "Simple LSP Client",
   "description": "A configurable VS Code LSP client extension.",
   "version": "0.0.1",
-  "private": true,
   "publisher": "wdomitrz",
   "license": "AGPL-3.0-only",
   "homepage": "https://github.com/wdomitrz/simple_lsp_client#readme",
@@ -96,8 +95,15 @@
                 "markdownDescription": "Environment variables to add or override for the server process."
               },
               "initializationOptions": {
-                "type": "object",
-                "markdownDescription": "JSON object passed to the server as LSP initializationOptions."
+                "type": [
+                  "object",
+                  "array",
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ],
+                "markdownDescription": "JSON value passed to the server as LSP initializationOptions."
               }
             }
           },

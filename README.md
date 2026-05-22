@@ -22,13 +22,16 @@ Each server supports:
 - `cmd`: exact command and arguments to run.
 - `filetypes`: VS Code language IDs to attach to.
 - `env`: optional environment variables for the server process.
-- `initializationOptions`: optional JSON object passed in the LSP initialize request.
+- `initializationOptions`: optional JSON value passed in the LSP initialize request.
 
 The extension does not add transport flags like `--stdio`. Put only the
 arguments your server expects in `cmd`.
 
 When a workspace is open, server processes use the first workspace folder as
 their working directory.
+
+`env` values are literal strings. They are merged over the extension host
+environment; no variable interpolation or unsetting is performed.
 
 ## Examples
 

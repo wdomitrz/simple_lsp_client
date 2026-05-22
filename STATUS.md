@@ -23,6 +23,15 @@
 - [x] Add optional per-server `initializationOptions`.
 - [x] Simplify README and include verified examples.
 - [x] Run final verification after env/options/docs changes.
+- [x] Serialize restart operations.
+- [x] Make server start failures isolated per server.
+- [ ] Keep startup behavior simple instead of adding language-aware client start/stop tracking.
+- [x] Add minimal runtime config safety for `cmd` and `filetypes`.
+- [x] Make `initializationOptions` accept any JSON value.
+- [x] Document `env` overlay behavior.
+- [x] Make status output easier to read.
+- [x] Remove `private: true` for upcoming public availability.
+- [x] Run final verification after review fixes.
 
 ## Notes
 
@@ -37,6 +46,8 @@
 - Server processes use the first VS Code workspace folder as `cwd` when available.
 - Activation now uses generic `onLanguage` plus command activation instead of `onStartupFinished`.
 - Server config now supports optional `env` and `initializationOptions`.
+- Restart operations are serialized to avoid duplicate clients.
+- Server startup failures are isolated and do not block other configured servers.
 
 ## Manual Verification
 
