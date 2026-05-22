@@ -1,0 +1,8 @@
+.git/**
+.vscode/**
+node_modules/**
+src/**
+*.map
+eslint.config.mjs
+tsconfig.json
+Makefile

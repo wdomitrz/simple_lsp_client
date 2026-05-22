@@ -1,0 +1,31 @@
+{
+  "name": "simple-lsp-client",
+  "displayName": "Simple LSP Client",
+  "description": "A configurable VS Code LSP client extension.",
+  "version": "0.0.1",
+  "private": true,
+  "publisher": "local",
+  "engines": { "vscode": "^1.100.0" },
+  "categories": ["Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./dist/extension.js",
+  "scripts": {
+    "compile": "tsc -p ./",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "npm run compile",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^24.10.1",
+    "@types/vscode": "^1.100.0",
+    "@vscode/vsce": "^3.6.4",
+    "eslint": "^9.39.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4"
+  },
+  "dependencies": { "vscode-languageclient": "^9.0.1" }
+}
