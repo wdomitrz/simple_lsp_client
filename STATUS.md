@@ -14,6 +14,15 @@
 - [x] Add user-facing restart command.
 - [x] Add README with configuration and manual test instructions.
 - [x] Run final verification after documentation and command polish.
+- [x] Add command to list active clients and status.
+- [x] Set server process `cwd` and client workspace folder to the first workspace root.
+- [x] Add marketplace/publishing metadata beyond local packaging.
+- [x] Replace startup activation with generic language and command activation.
+- [x] Run final verification after status/workspace/metadata changes.
+- [x] Add optional per-server `env`.
+- [x] Add optional per-server `initializationOptions`.
+- [x] Simplify README and include verified examples.
+- [x] Run final verification after env/options/docs changes.
 
 ## Notes
 
@@ -24,3 +33,13 @@
 - The generated VSIX excludes repo-only status and build metadata.
 - First testable VSIX: `simple-lsp-client-0.0.1.vsix`.
 - Fixed executable server startup so no `--stdio` flag is injected by `vscode-languageclient`.
+- Server status can be shown with `Simple LSP Client: Show Status`.
+- Server processes use the first VS Code workspace folder as `cwd` when available.
+- Activation now uses generic `onLanguage` plus command activation instead of `onStartupFinished`.
+- Server config now supports optional `env` and `initializationOptions`.
+
+## Manual Verification
+
+- Ruff starts with `ruff server`; formatting and diagnostics work.
+- basedpyright starts with `basedpyright-langserver --stdio` and works alongside Ruff for Python.
+- clangd starts with `clangd`; diagnostics, hover/navigation, completion, rename, and formatting work on C++.

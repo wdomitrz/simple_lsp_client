@@ -1,20 +1,36 @@
 # Simple LSP Client
 
-A small VS Code extension that starts configured stdio language servers.
+A minimal VS Code extension that starts configured stdio language servers.
 
 ## Configuration
 
-Configure servers with `simpleLspClient.servers`. The setting is an object keyed
-by server name. Each server has:
+Configure `simpleLspClient.servers` as an object keyed by server name:
 
-- `cmd`: exact command plus arguments used to start the server.
-- `filetypes`: VS Code language IDs the server should attach to.
+```json
+{
+  "simpleLspClient.servers": {
+    "ruff": {
+      "cmd": ["ruff", "server"],
+      "filetypes": ["python"]
+    }
+  }
+}
+```
 
-The extension communicates with the server process over its standard input and
-output streams. It does not add stdio-related command-line flags. Put only the
-arguments required by that server in `cmd`.
+Each server supports:
 
-Example:
+- `cmd`: exact command and arguments to run.
+- `filetypes`: VS Code language IDs to attach to.
+- `env`: optional environment variables for the server process.
+- `initializationOptions`: optional JSON object passed in the LSP initialize request.
+
+The extension does not add transport flags like `--stdio`. Put only the
+arguments your server expects in `cmd`.
+
+When a workspace is open, server processes use the first workspace folder as
+their working directory.
+
+## Examples
 
 ```json
 {
@@ -23,47 +39,44 @@ Example:
       "cmd": ["ruff", "server"],
       "filetypes": ["python"]
     },
-    "ruff-extra": {
-      "cmd": ["ruff", "server"],
-      "filetypes": ["python", "python-env"]
+    "basedpyright": {
+      "cmd": ["basedpyright-langserver", "--stdio"],
+      "filetypes": ["python"]
+    },
+    "clangd": {
+      "cmd": ["clangd"],
+      "filetypes": ["c", "cpp", "objective-c", "objective-cpp"]
     }
   }
 }
 ```
 
-Multiple servers can use the same language ID. The extension starts one client
-per configured server.
+Example with environment and initialization options:
+
+```json
+{
+  "simpleLspClient.servers": {
+    "custom": {
+      "cmd": ["custom-language-server"],
+      "filetypes": ["custom"],
+      "env": {
+        "CUSTOM_SDK": "/opt/custom-sdk"
+      },
+      "initializationOptions": {
+        "indexWorkspace": true
+      }
+    }
+  }
+}
+```
 
 ## Commands
 
 - `Simple LSP Client: Restart Servers`
+- `Simple LSP Client: Show Status`
 
-Use this command after changing server binaries or environment setup. Changes to
-`simpleLspClient.servers` restart clients automatically.
+## Build
 
-## Manual Test
-
-1. Build the VSIX:
-
-   ```sh
-   make vsix
-   ```
-
-2. Install `simple-lsp-client-0.0.1.vsix` in VS Code.
-
-3. Add a test configuration:
-
-   ```json
-   {
-     "simpleLspClient.servers": {
-       "ruff": {
-         "cmd": ["ruff", "server"],
-         "filetypes": ["python"]
-       }
-     }
-   }
-   ```
-
-4. Open a Python file.
-
-5. Check the `Simple LSP Client` output channel for startup logs.
+```sh
+make vsix
+```

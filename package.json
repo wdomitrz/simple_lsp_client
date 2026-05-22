@@ -4,8 +4,22 @@
   "description": "A configurable VS Code LSP client extension.",
   "version": "0.0.1",
   "private": true,
-  "publisher": "local",
+  "publisher": "wdomitrz",
   "license": "AGPL-3.0-only",
+  "homepage": "https://github.com/wdomitrz/simple_lsp_client#readme",
+  "bugs": {
+    "url": "https://github.com/wdomitrz/simple_lsp_client/issues"
+  },
+  "keywords": [
+    "lsp",
+    "language-server",
+    "language-client",
+    "ruff",
+    "basedpyright",
+    "clangd"
+  ],
+  "qna": false,
+  "preview": true,
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/wdomitrz/simple_lsp_client.git"
@@ -14,16 +28,31 @@
     "vscode": "^1.100.0"
   },
   "categories": [
+    "Programming Languages",
+    "Linters",
     "Other"
   ],
+  "galleryBanner": {
+    "color": "#1f2937",
+    "theme": "dark"
+  },
+  "extensionKind": [
+    "workspace"
+  ],
   "activationEvents": [
-    "onStartupFinished"
+    "onLanguage",
+    "onCommand:simpleLspClient.restartServers",
+    "onCommand:simpleLspClient.showStatus"
   ],
   "contributes": {
     "commands": [
       {
         "command": "simpleLspClient.restartServers",
         "title": "Simple LSP Client: Restart Servers"
+      },
+      {
+        "command": "simpleLspClient.showStatus",
+        "title": "Simple LSP Client: Show Status"
       }
     ],
     "configuration": {
@@ -58,6 +87,17 @@
                   "minLength": 1
                 },
                 "markdownDescription": "VS Code language IDs this LSP server should attach to."
+              },
+              "env": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "markdownDescription": "Environment variables to add or override for the server process."
+              },
+              "initializationOptions": {
+                "type": "object",
+                "markdownDescription": "JSON object passed to the server as LSP initializationOptions."
               }
             }
           },
