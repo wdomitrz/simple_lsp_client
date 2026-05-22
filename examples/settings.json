@@ -1,0 +1,16 @@
+{
+  "simpleLspClient.servers": {
+    "ruff": {
+      "cmd": ["ruff", "server"],
+      "filetypes": ["python"]
+    },
+    "basedpyright": {
+      "cmd": ["basedpyright-langserver", "--stdio"],
+      "filetypes": ["python"]
+    },
+    "clangd": {
+      "cmd": ["clangd"],
+      "filetypes": ["c", "cpp", "objective-c", "objective-cpp"]
+    }
+  }
+}

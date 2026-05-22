@@ -4,6 +4,7 @@ import {
   workspace,
   type ExtensionContext,
   type OutputChannel,
+  type TextDocument,
   type WorkspaceFolder,
 } from "vscode";
 import {
@@ -69,6 +70,9 @@ export function activate(context: ExtensionContext): void {
         void queueRestart();
       }
     }),
+    workspace.onDidOpenTextDocument((document) => {
+      void startClientsForDocument(document);
+    }),
   );
 
   void queueRestart();
@@ -83,9 +87,11 @@ export async function deactivate(): Promise<void> {
 async function restartClients(): Promise<void> {
   await stopClients();
 
-  const servers = readServerConfigs();
+  const servers = readServerConfigs().filter((server) =>
+    shouldRunServer(server),
+  );
   if (servers.length === 0) {
-    outputChannel?.appendLine("No LSP servers configured.");
+    outputChannel?.appendLine("No matching LSP servers for open documents.");
     return;
   }
 
@@ -193,6 +199,22 @@ function getRootWorkspaceFolder(): WorkspaceFolder | undefined {
   return workspace.workspaceFolders?.[0];
 }
 
+async function startClientsForDocument(document: TextDocument): Promise<void> {
+  if (!isSupportedDocument(document)) {
+    return;
+  }
+
+  await restartQueue;
+
+  const servers = readServerConfigs().filter(
+    (server) =>
+      server.filetypes.includes(document.languageId) &&
+      !activeClients.some(({ config }) => config.name === server.name),
+  );
+
+  await Promise.all(servers.map((server) => startClient(server)));
+}
+
 function showStatus(): void {
   const channel = getOutputChannel();
   channel.appendLine("");
@@ -260,6 +282,18 @@ function isValidServerConfig(config: ServerConfig): boolean {
 
 function isNonEmptyStringArray(value: string[]): value is NonEmptyStringArray {
   return value.length > 0 && value.every((item) => item.length > 0);
+}
+
+function shouldRunServer(server: NamedServerConfig): boolean {
+  return workspace.textDocuments.some(
+    (document) =>
+      isSupportedDocument(document) &&
+      server.filetypes.includes(document.languageId),
+  );
+}
+
+function isSupportedDocument(document: TextDocument): boolean {
+  return document.uri.scheme === "file" || document.uri.scheme === "untitled";
 }
 
 function formatError(error: unknown): string {

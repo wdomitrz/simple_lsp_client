@@ -131,8 +131,8 @@
     "bundle": "esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --minify --outfile=dist/extension.js",
     "compile": "npm run typecheck && npm run bundle",
     "lint": "eslint src/**/*.ts",
-    "format": "prettier --write package.json package-lock.json tsconfig.json eslint.config.mjs .prettierrc.json README.md STATUS.md src/**/*.ts",
-    "format:check": "prettier --check package.json package-lock.json tsconfig.json eslint.config.mjs .prettierrc.json README.md STATUS.md src/**/*.ts",
+    "format": "prettier --write package.json package-lock.json tsconfig.json eslint.config.mjs .prettierrc.json README.md STATUS.md examples/**/*.json src/**/*.ts",
+    "format:check": "prettier --check package.json package-lock.json tsconfig.json eslint.config.mjs .prettierrc.json README.md STATUS.md examples/**/*.json src/**/*.ts",
     "test": "npm run compile",
     "package": "vsce package --no-dependencies"
   },

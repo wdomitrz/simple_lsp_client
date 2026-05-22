@@ -32,6 +32,11 @@
 - [x] Make status output easier to read.
 - [x] Remove `private: true` for upcoming public availability.
 - [x] Run final verification after review fixes.
+- [x] Add README known limitations.
+- [x] Add example settings file.
+- [x] Start servers only when a matching document is open.
+- [x] Start newly relevant servers on document open.
+- [x] Keep servers running after matching documents close.
 
 ## Notes
 
@@ -48,6 +53,7 @@
 - Server config now supports optional `env` and `initializationOptions`.
 - Restart operations are serialized to avoid duplicate clients.
 - Server startup failures are isolated and do not block other configured servers.
+- Servers start lazily for matching open documents and are not stopped on close.
 
 ## Manual Verification
 

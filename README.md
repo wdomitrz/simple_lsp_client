@@ -78,8 +78,18 @@ Example with environment and initialization options:
 - `Simple LSP Client: Restart Servers`
 - `Simple LSP Client: Show Status`
 
+## Behavior
+
+- Servers start when a matching document is already open or later opened.
+- Servers stay running after matching documents close.
+- The first workspace folder is used as the server process working directory.
+- `env` values are literal strings; no interpolation or unsetting is performed.
+- Only stdio language servers are supported.
+
 ## Build
 
 ```sh
 make vsix
 ```
+
+See [examples/settings.json](examples/settings.json) for a multi-server setup.
