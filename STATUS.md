@@ -49,6 +49,9 @@
 - [x] Collapse implementation back into one TypeScript file.
 - [x] Add VS Code-style variable expansion for commands and environment values.
 - [x] Add command to list available variable values.
+- [x] Add formatter `${relativeFile}` placeholder.
+- [x] Add README manual test checklist.
+- [x] Polish marketplace metadata before packaging.
 
 ## Notes
 
@@ -58,7 +61,7 @@
 - All servers are assumed to use stdio.
 - Runtime config validation is intentionally minimal and only checks non-empty `cmd` and `filetypes` arrays.
 - The generated VSIX excludes repo-only status and build metadata.
-- Current testable VSIX: `simple-lsp-client-0.1.4.vsix`.
+- Current testable VSIX: `simple-lsp-client-0.1.5.vsix`.
 - Fixed executable server startup so no `--stdio` flag is injected by `vscode-languageclient`.
 - Server status can be shown with `Simple LSP Client: Show Status`.
 - Configured servers and formatters can be listed separately from the command palette.
@@ -73,7 +76,7 @@
 - Formatter providers are registered for matching language IDs across URI schemes; LSP clients remain limited to `file` and `untitled`.
 - Source is kept in one TypeScript file with focused sections.
 - Server and formatter `cmd` entries and `env` values support `${workspaceFolder}`, `${workspaceFolderBasename}`, `${cwd}`, `${userHome}`, `${pathSeparator}`, and `${execPath}`.
-- Formatter commands additionally support `${file}` and `${filetype}`.
+- Formatter commands and env values additionally support `${file}`, `${relativeFile}`, and `${filetype}`.
 - Server and formatter processes receive `SIMPLE_LSP_CLIENT_*` environment variables for the same workspace/process context.
 
 ## Manual Verification

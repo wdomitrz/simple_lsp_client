@@ -1,8 +1,8 @@
 {
   "name": "simple-lsp-client",
   "displayName": "Simple LSP Client",
-  "description": "A configurable VS Code LSP client extension.",
-  "version": "0.1.4",
+  "description": "Run configured stdio LSP servers and stdin/stdout formatters.",
+  "version": "0.1.5",
   "publisher": "wdomitrz",
   "license": "AGPL-3.0-only",
   "homepage": "https://github.com/wdomitrz/simple_lsp_client#readme",
@@ -13,6 +13,8 @@
     "lsp",
     "language-server",
     "language-client",
+    "formatter",
+    "formatting",
     "ruff",
     "basedpyright",
     "clangd"
@@ -28,6 +30,7 @@
   },
   "categories": [
     "Programming Languages",
+    "Formatters",
     "Linters",
     "Other"
   ],
@@ -86,7 +89,7 @@
                   "type": "string",
                   "minLength": 1
                 },
-                "markdownDescription": "Command and arguments used to start the LSP server over stdio."
+                "markdownDescription": "Command and arguments used to start the LSP server over stdio. Supports `${workspaceFolder}`, `${workspaceFolderBasename}`, `${cwd}`, `${userHome}`, `${pathSeparator}`, and `${execPath}` placeholders."
               },
               "filetypes": {
                 "type": "array",
@@ -102,7 +105,7 @@
                 "additionalProperties": {
                   "type": "string"
                 },
-                "markdownDescription": "Environment variables to add or override for the server process."
+                "markdownDescription": "Environment variables to add or override for the server process. Values support `${workspaceFolder}`, `${workspaceFolderBasename}`, `${cwd}`, `${userHome}`, `${pathSeparator}`, and `${execPath}` placeholders."
               },
               "initializationOptions": {
                 "type": [
@@ -150,7 +153,7 @@
                   "type": "string",
                   "minLength": 1
                 },
-                "markdownDescription": "Command and arguments used to format stdin into stdout. Supports `${file}` and `${filetype}` placeholders."
+                "markdownDescription": "Command and arguments used to format stdin into stdout. Supports `${workspaceFolder}`, `${workspaceFolderBasename}`, `${cwd}`, `${userHome}`, `${pathSeparator}`, `${execPath}`, `${file}`, `${relativeFile}`, and `${filetype}` placeholders."
               },
               "filetypes": {
                 "type": "array",
@@ -166,7 +169,7 @@
                 "additionalProperties": {
                   "type": "string"
                 },
-                "markdownDescription": "Environment variables to add or override for the formatter process."
+                "markdownDescription": "Environment variables to add or override for the formatter process. Values support `${workspaceFolder}`, `${workspaceFolderBasename}`, `${cwd}`, `${userHome}`, `${pathSeparator}`, `${execPath}`, `${file}`, `${relativeFile}`, and `${filetype}` placeholders."
               }
             }
           },

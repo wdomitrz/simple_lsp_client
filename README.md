@@ -1,6 +1,7 @@
 # Simple LSP Client
 
-A minimal VS Code extension that starts configured stdio language servers.
+A minimal VS Code extension that starts configured stdio language servers and
+stdin/stdout formatters.
 
 ## Configuration
 
@@ -34,7 +35,7 @@ Each server and formatter supports:
 
 - `cmd`: exact command and arguments to run.
 - `filetypes`: VS Code language IDs to attach to.
-- `env`: optional environment variables for the server process.
+- `env`: optional environment variables for the process.
 
 Servers also support:
 
@@ -43,12 +44,7 @@ Servers also support:
 The extension does not add transport flags like `--stdio`. Put only the
 arguments your server expects in `cmd`.
 
-Formatters always receive document text on stdin and must write formatted text
-to stdout. Formatter commands support `${file}` and `${filetype}` placeholders
-inside `cmd`. Unlike LSP clients, formatters are registered by language ID
-without restricting the document URI scheme.
-
-Commands and `env` values support these variables:
+Server `cmd` entries and `env` values support these variables:
 
 - `${workspaceFolder}`
 - `${workspaceFolderBasename}`
@@ -57,9 +53,19 @@ Commands and `env` values support these variables:
 - `${pathSeparator}`
 - `${execPath}`
 
-Formatters also support `${file}` and `${filetype}`. Server and formatter
-processes also receive matching `SIMPLE_LSP_CLIENT_*` environment variables for
-the workspace, cwd, user home, path separator, and VS Code executable path.
+Formatter `cmd` entries and `env` values support those variables plus:
+
+- `${file}`
+- `${relativeFile}`
+- `${filetype}`
+
+Formatters always receive document text on stdin and must write formatted text
+to stdout. Unlike LSP clients, formatters are registered by language ID without
+restricting the document URI scheme.
+
+Server and formatter processes also receive matching `SIMPLE_LSP_CLIENT_*`
+environment variables for the workspace, cwd, user home, path separator, and VS
+Code executable path.
 
 When a workspace is open, server processes use the first workspace folder as
 their working directory.
@@ -127,8 +133,17 @@ Example with environment and initialization options:
 - Servers start when a matching document is already open or later opened.
 - Servers stay running after matching documents close.
 - The first workspace folder is used as the server process working directory.
-- `env` values are literal strings; no interpolation or unsetting is performed.
+- `cmd` entries and `env` values expand the documented placeholders.
 - Only stdio language servers are supported.
+
+## Manual Test Checklist
+
+- Open a Python file with Ruff configured as `["ruff", "server"]`; confirm diagnostics or formatting work.
+- Open a Python file with both Ruff and basedpyright configured; confirm both clients appear in `Show Status`.
+- Open a C or C++ file with clangd configured; confirm hover, completion, diagnostics, or formatting work.
+- Configure only a formatter for `jsonc`; confirm VS Code offers it for `Format Document`.
+- Change `simpleLspClient.servers` or `simpleLspClient.formatters`; confirm reload behavior in the output channel.
+- Run `Simple LSP Client: List Variables`; confirm workspace variables resolve as expected.
 
 ## Build
 

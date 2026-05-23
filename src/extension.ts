@@ -1,6 +1,6 @@
 import { spawn, type SpawnOptionsWithoutStdio } from "node:child_process";
 import { homedir } from "node:os";
-import { basename, sep } from "node:path";
+import { basename, relative, sep } from "node:path";
 import {
   commands,
   languages,
@@ -81,6 +81,12 @@ interface VariableValues extends Record<string, string> {
   userHome: string;
   pathSeparator: string;
   execPath: string;
+}
+
+interface FormatterVariableValues extends VariableValues {
+  file: string;
+  filetype: string;
+  relativeFile: string;
 }
 
 const configSection = "simpleLspClient";
@@ -327,11 +333,7 @@ async function runFormatter(
   }
 
   const workspaceFolder = getRootWorkspaceFolder();
-  const variables = {
-    ...createVariableValues(workspaceFolder),
-    file: getDocumentFileName(document),
-    filetype: document.languageId,
-  } satisfies VariableValues & Record<"file" | "filetype", string>;
+  const variables = createFormatterVariableValues(document, workspaceFolder);
   const [command, ...args] = expandCommand(formatter.cmd, variables);
   const options: SpawnOptionsWithoutStdio = {
     cwd: variables.cwd,
@@ -526,6 +528,32 @@ function createVariableValues(
   };
 }
 
+function createFormatterVariableValues(
+  document: TextDocument,
+  workspaceFolder: WorkspaceFolder | undefined,
+): FormatterVariableValues {
+  const baseVariables = createVariableValues(workspaceFolder);
+  const file = getDocumentFileName(document);
+
+  return {
+    ...baseVariables,
+    file,
+    filetype: document.languageId,
+    relativeFile: getRelativeFileName(file, workspaceFolder),
+  };
+}
+
+function getRelativeFileName(
+  fileName: string,
+  workspaceFolder: WorkspaceFolder | undefined,
+): string {
+  if (workspaceFolder === undefined || fileName.length === 0) {
+    return fileName;
+  }
+
+  return relative(workspaceFolder.uri.fsPath, fileName);
+}
+
 function expandCommand(
   command: NonEmptyStringArray,
   variables: Record<string, string>,
@@ -639,6 +667,11 @@ function listVariables(): void {
   channel.appendLine("- SIMPLE_LSP_CLIENT_USER_HOME");
   channel.appendLine("- SIMPLE_LSP_CLIENT_PATH_SEPARATOR");
   channel.appendLine("- SIMPLE_LSP_CLIENT_EXEC_PATH");
+  channel.appendLine("");
+  channel.appendLine("Formatter-only variables:");
+  channel.appendLine("- ${file}");
+  channel.appendLine("- ${relativeFile}");
+  channel.appendLine("- ${filetype}");
   channel.show(true);
 }
 
