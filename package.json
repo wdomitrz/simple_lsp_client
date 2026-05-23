@@ -39,9 +39,7 @@
     "workspace"
   ],
   "activationEvents": [
-    "onLanguage",
-    "onCommand:simpleLspClient.restartServers",
-    "onCommand:simpleLspClient.showStatus"
+    "onLanguage"
   ],
   "contributes": {
     "commands": [

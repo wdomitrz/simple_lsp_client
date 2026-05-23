@@ -6,7 +6,6 @@
     "lib": ["ES2022"],
     "outDir": "dist",
     "rootDir": "src",
-    "sourceMap": true,
     "strict": true,
     "exactOptionalPropertyTypes": true,
     "noImplicitReturns": true,

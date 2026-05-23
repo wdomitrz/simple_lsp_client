@@ -31,6 +31,13 @@ interface ServerConfig {
   initializationOptions?: JsonValue;
 }
 
+interface RawServerConfig {
+  cmd?: string[];
+  filetypes?: string[];
+  env?: Record<string, string>;
+  initializationOptions?: JsonValue;
+}
+
 interface NamedServerConfig extends ServerConfig {
   name: string;
 }
@@ -181,7 +188,7 @@ function createDocumentSelector(
 function readServerConfigs(): NamedServerConfig[] {
   const servers = workspace
     .getConfiguration(configSection)
-    .get<Record<string, ServerConfig>>(serversConfigKey, {});
+    .get<Record<string, RawServerConfig>>(serversConfigKey, {});
 
   return Object.entries(servers).flatMap(([name, config]) => {
     if (isValidServerConfig(config)) {
@@ -208,7 +215,7 @@ async function startClientsForDocument(document: TextDocument): Promise<void> {
 
   const servers = readServerConfigs().filter(
     (server) =>
-      server.filetypes.includes(document.languageId) &&
+      serverMatchesDocument(server, document) &&
       !activeClients.some(({ config }) => config.name === server.name),
   );
 
@@ -274,9 +281,12 @@ async function stopFailedClient(
   }
 }
 
-function isValidServerConfig(config: ServerConfig): boolean {
+function isValidServerConfig(config: RawServerConfig): config is ServerConfig {
   return (
-    isNonEmptyStringArray(config.cmd) && isNonEmptyStringArray(config.filetypes)
+    config.cmd !== undefined &&
+    config.filetypes !== undefined &&
+    isNonEmptyStringArray(config.cmd) &&
+    isNonEmptyStringArray(config.filetypes)
   );
 }
 
@@ -285,10 +295,18 @@ function isNonEmptyStringArray(value: string[]): value is NonEmptyStringArray {
 }
 
 function shouldRunServer(server: NamedServerConfig): boolean {
-  return workspace.textDocuments.some(
-    (document) =>
-      isSupportedDocument(document) &&
-      server.filetypes.includes(document.languageId),
+  return workspace.textDocuments.some((document) =>
+    serverMatchesDocument(server, document),
+  );
+}
+
+function serverMatchesDocument(
+  server: NamedServerConfig,
+  document: TextDocument,
+): boolean {
+  return (
+    isSupportedDocument(document) &&
+    server.filetypes.includes(document.languageId)
   );
 }
 

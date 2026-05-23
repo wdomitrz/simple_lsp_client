@@ -30,9 +30,6 @@ arguments your server expects in `cmd`.
 When a workspace is open, server processes use the first workspace folder as
 their working directory.
 
-`env` values are literal strings. They are merged over the extension host
-environment; no variable interpolation or unsetting is performed.
-
 ## Examples
 
 ```json

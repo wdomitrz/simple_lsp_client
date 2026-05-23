@@ -25,7 +25,7 @@
 - [x] Run final verification after env/options/docs changes.
 - [x] Serialize restart operations.
 - [x] Make server start failures isolated per server.
-- [ ] Keep startup behavior simple instead of adding language-aware client start/stop tracking.
+- [x] Add simple language-aware lazy start without stop-on-close tracking.
 - [x] Add minimal runtime config safety for `cmd` and `filetypes`.
 - [x] Make `initializationOptions` accept any JSON value.
 - [x] Document `env` overlay behavior.
@@ -50,6 +50,7 @@
 - Server status can be shown with `Simple LSP Client: Show Status`.
 - Server processes use the first VS Code workspace folder as `cwd` when available.
 - Activation now uses generic `onLanguage` plus command activation instead of `onStartupFinished`.
+- Explicit command activation events were removed; modern VS Code activates contributed commands automatically.
 - Server config now supports optional `env` and `initializationOptions`.
 - Restart operations are serialized to avoid duplicate clients.
 - Server startup failures are isolated and do not block other configured servers.
