@@ -94,10 +94,12 @@ type ExpansionVariables = VariableValues | FormatterVariableValues;
 const configSection = "simpleLspClient";
 const serversConfigKey = "servers";
 const formattersConfigKey = "formatters";
+const formatterTimeoutMsConfigKey = "formatterTimeoutMs";
 const outputChannelName = "Simple LSP Client";
 
 let outputChannel: OutputChannel | undefined;
 let activeClients: ActiveClient[] = [];
+let startingClientNames = new Set<string>();
 let formatterDisposables: Disposable[] = [];
 let restartQueue: Promise<void> = Promise.resolve();
 
@@ -184,6 +186,7 @@ async function restartClients(): Promise<void> {
 async function stopClients(): Promise<void> {
   const clientsToStop = activeClients;
   activeClients = [];
+  startingClientNames = new Set();
 
   await Promise.all(
     clientsToStop.map(async ({ client, config }) => {
@@ -207,8 +210,7 @@ async function startClientsForDocument(document: TextDocument): Promise<void> {
 
   const servers = readServerConfigs().filter(
     (server) =>
-      serverMatchesDocument(server, document) &&
-      !activeClients.some(({ config }) => config.name === server.name),
+      serverMatchesDocument(server, document) && shouldStartServer(server.name),
   );
 
   await Promise.all(servers.map((server) => startClient(server)));
@@ -249,6 +251,7 @@ async function startClient(config: NamedServerConfig): Promise<void> {
   appendOutputLine(
     `Starting ${config.name}: ${[command, ...args].join(" ")}${formatWorkspaceFolder(workspaceFolder)}`,
   );
+  startingClientNames.add(config.name);
   try {
     await client.start();
     activeClients.push({ config, client, workspaceFolder });
@@ -257,6 +260,8 @@ async function startClient(config: NamedServerConfig): Promise<void> {
       `Failed to start LSP client "${config.name}": ${formatError(error)}`,
     );
     await stopFailedClient(client, config);
+  } finally {
+    startingClientNames.delete(config.name);
   }
 }
 
@@ -276,6 +281,13 @@ async function stopFailedClient(
 function shouldRunServer(server: NamedServerConfig): boolean {
   return workspace.textDocuments.some((document) =>
     serverMatchesDocument(server, document),
+  );
+}
+
+function shouldStartServer(serverName: string): boolean {
+  return (
+    !startingClientNames.has(serverName) &&
+    !activeClients.some(({ config }) => config.name === serverName)
   );
 }
 
@@ -352,6 +364,7 @@ async function runFormatter(
     args,
     options,
     input,
+    readFormatterTimeoutMs(),
     token,
   );
 }
@@ -362,6 +375,7 @@ function runFormatterProcess(
   args: string[],
   options: SpawnOptionsWithoutStdio,
   input: string,
+  timeoutMs: number,
   token: CancellationToken,
 ): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -382,6 +396,24 @@ function runFormatterProcess(
       }
       callback();
     };
+
+    if (timeoutMs > 0) {
+      const timeout = setTimeout(() => {
+        settle(() => {
+          child.kill();
+          reject(
+            new Error(
+              `Formatting with "${formatterName}" timed out after ${String(timeoutMs)}ms.`,
+            ),
+          );
+        });
+      }, timeoutMs);
+      cleanup.push({
+        dispose: () => {
+          clearTimeout(timeout);
+        },
+      });
+    }
 
     cleanup.push(
       token.onCancellationRequested(() => {
@@ -426,6 +458,21 @@ function runFormatterProcess(
 
     child.stdin.end(input, "utf8");
   });
+}
+
+function readFormatterTimeoutMs(): number {
+  const timeoutMs = workspace
+    .getConfiguration(configSection)
+    .get<number>(formatterTimeoutMsConfigKey, 30_000);
+
+  if (!Number.isFinite(timeoutMs) || timeoutMs < 0) {
+    appendOutputLine(
+      `Ignoring invalid formatter timeout "${String(timeoutMs)}"; using 30000ms.`,
+    );
+    return 30_000;
+  }
+
+  return timeoutMs;
 }
 
 function readServerConfigs(): NamedServerConfig[] {

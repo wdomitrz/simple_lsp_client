@@ -41,6 +41,10 @@ Servers also support:
 
 - `initializationOptions`: optional JSON value passed in the LSP initialize request.
 
+Global formatter setting:
+
+- `simpleLspClient.formatterTimeoutMs`: formatter timeout in milliseconds. Defaults to `30000`; set to `0` to disable.
+
 The extension does not add transport flags like `--stdio`. Put only the
 arguments your server expects in `cmd`.
 
@@ -134,6 +138,7 @@ Example with environment and initialization options:
 - Servers stay running after matching documents close.
 - The first workspace folder is used as the server process working directory.
 - `cmd` entries and `env` values expand the documented placeholders.
+- Formatters are killed if they exceed `simpleLspClient.formatterTimeoutMs`.
 - Only stdio language servers are supported.
 
 ## Manual Test Checklist

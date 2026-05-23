@@ -2,7 +2,7 @@
   "name": "simple-lsp-client",
   "displayName": "Simple LSP Client",
   "description": "Run configured stdio LSP servers and stdin/stdout formatters.",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "publisher": "wdomitrz",
   "license": "AGPL-3.0-only",
   "homepage": "https://github.com/wdomitrz/simple_lsp_client#readme",
@@ -188,6 +188,12 @@
               }
             }
           ]
+        },
+        "simpleLspClient.formatterTimeoutMs": {
+          "type": "number",
+          "default": 30000,
+          "minimum": 0,
+          "markdownDescription": "Formatter process timeout in milliseconds. Set to 0 to disable the timeout."
         }
       }
     }

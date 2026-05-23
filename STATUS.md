@@ -55,6 +55,8 @@
 - [x] Clarify formatter-only variables in `List Variables`.
 - [x] Add top-level config guards for malformed server/formatter settings.
 - [x] Tighten variable expansion typing for server and formatter env values.
+- [x] Avoid duplicate LSP client starts while a matching server is already starting.
+- [x] Add global formatter timeout setting.
 
 ## Notes
 
@@ -64,7 +66,7 @@
 - All servers are assumed to use stdio.
 - Runtime config validation is intentionally minimal and only checks non-empty `cmd` and `filetypes` arrays.
 - The generated VSIX excludes repo-only status and build metadata.
-- Current testable VSIX: `simple-lsp-client-0.1.6.vsix`.
+- Current testable VSIX: `simple-lsp-client-0.1.7.vsix`.
 - Fixed executable server startup so no `--stdio` flag is injected by `vscode-languageclient`.
 - Server status can be shown with `Simple LSP Client: Show Status`.
 - Configured servers and formatters can be listed separately from the command palette.
@@ -81,6 +83,7 @@
 - Server and formatter `cmd` entries and `env` values support `${workspaceFolder}`, `${workspaceFolderBasename}`, `${cwd}`, `${userHome}`, `${pathSeparator}`, and `${execPath}`.
 - Formatter commands and env values additionally support `${file}`, `${relativeFile}`, and `${filetype}`.
 - Server and formatter processes receive `SIMPLE_LSP_CLIENT_*` environment variables for the same workspace/process context.
+- `simpleLspClient.formatterTimeoutMs` defaults to 30000; 0 disables formatter timeout.
 
 ## Manual Verification
 
