@@ -96,6 +96,7 @@ const serversConfigKey = "servers";
 const formattersConfigKey = "formatters";
 const formatterTimeoutMsConfigKey = "formatterTimeoutMs";
 const outputChannelName = "Simple LSP Client";
+const defaultFormatterTimeoutMs = 30_000;
 
 let outputChannel: OutputChannel | undefined;
 let activeClients: ActiveClient[] = [];
@@ -172,8 +173,8 @@ function queueRestartClients(): Promise<void> {
 async function restartClients(): Promise<void> {
   await stopClients();
 
-  const servers = readServerConfigs().filter((server) =>
-    shouldRunServer(server),
+  const servers = readServerConfigs().filter(
+    (server) => shouldRunServer(server) && shouldStartServer(server.name),
   );
   if (servers.length === 0) {
     appendOutputLine("No matching LSP servers for open documents.");
@@ -185,19 +186,24 @@ async function restartClients(): Promise<void> {
 
 async function stopClients(): Promise<void> {
   const clientsToStop = activeClients;
-  activeClients = [];
+  const stoppedClients = new Set<LanguageClient>();
   startingClientNames = new Set();
 
   await Promise.all(
     clientsToStop.map(async ({ client, config }) => {
       try {
         await client.stop();
+        stoppedClients.add(client);
       } catch (error) {
         appendOutputLine(
           `Failed to stop LSP client "${config.name}": ${formatError(error)}`,
         );
       }
     }),
+  );
+
+  activeClients = activeClients.filter(
+    ({ client }) => !stoppedClients.has(client),
   );
 }
 
@@ -466,13 +472,13 @@ function runFormatterProcess(
 function readFormatterTimeoutMs(): number {
   const timeoutMs = workspace
     .getConfiguration(configSection)
-    .get<number>(formatterTimeoutMsConfigKey, 30_000);
+    .get<number>(formatterTimeoutMsConfigKey, defaultFormatterTimeoutMs);
 
   if (!Number.isFinite(timeoutMs) || timeoutMs < 0) {
     appendOutputLine(
-      `Ignoring invalid formatter timeout "${String(timeoutMs)}"; using 30000ms.`,
+      `Ignoring invalid formatter timeout "${String(timeoutMs)}"; using ${String(defaultFormatterTimeoutMs)}ms.`,
     );
-    return 30_000;
+    return defaultFormatterTimeoutMs;
   }
 
   return timeoutMs;
@@ -657,17 +663,14 @@ function createProcessEnv(
 ): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = {
     ...process.env,
+    SIMPLE_LSP_CLIENT_WORKSPACE_FOLDER: variables.workspaceFolder,
+    SIMPLE_LSP_CLIENT_WORKSPACE_FOLDER_BASENAME:
+      variables.workspaceFolderBasename,
     SIMPLE_LSP_CLIENT_CWD: variables.cwd,
     SIMPLE_LSP_CLIENT_USER_HOME: variables.userHome,
     SIMPLE_LSP_CLIENT_PATH_SEPARATOR: variables.pathSeparator,
     SIMPLE_LSP_CLIENT_EXEC_PATH: variables.execPath,
   };
-
-  if (variables.workspaceFolder.length > 0) {
-    env.SIMPLE_LSP_CLIENT_WORKSPACE_FOLDER = variables.workspaceFolder;
-    env.SIMPLE_LSP_CLIENT_WORKSPACE_FOLDER_BASENAME =
-      variables.workspaceFolderBasename;
-  }
 
   for (const [key, value] of Object.entries(configuredEnv ?? {})) {
     env[key] = expandVariables(value, variables);
@@ -743,7 +746,7 @@ function listVariables(): void {
   }
 
   channel.appendLine("");
-  channel.appendLine("Server environment variables:");
+  channel.appendLine("Process environment variables:");
   channel.appendLine("- SIMPLE_LSP_CLIENT_WORKSPACE_FOLDER");
   channel.appendLine("- SIMPLE_LSP_CLIENT_WORKSPACE_FOLDER_BASENAME");
   channel.appendLine("- SIMPLE_LSP_CLIENT_CWD");

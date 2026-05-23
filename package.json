@@ -2,7 +2,7 @@
   "name": "simple-lsp-client",
   "displayName": "Simple LSP Client",
   "description": "Run configured stdio LSP servers and stdin/stdout formatters.",
-  "version": "0.1.8",
+  "version": "0.1.10",
   "publisher": "wdomitrz",
   "license": "AGPL-3.0-only",
   "homepage": "https://github.com/wdomitrz/simple_lsp_client#readme",

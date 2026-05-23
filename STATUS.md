@@ -59,6 +59,9 @@
 - [x] Add global formatter timeout setting.
 - [x] Track LSP clients before startup resolves so config reloads can stop in-flight clients.
 - [x] Harden malformed named server/formatter config and env validation.
+- [x] Keep LSP clients tracked when stop fails, avoiding duplicate restart clients.
+- [x] Remove unnecessary formatter timeout maximum.
+- [x] Always expose `SIMPLE_LSP_CLIENT_WORKSPACE_*` env variables, using empty values without a workspace.
 
 ## Notes
 
@@ -68,7 +71,7 @@
 - All servers are assumed to use stdio.
 - Runtime config validation is intentionally minimal and only checks non-empty `cmd` and `filetypes` arrays.
 - The generated VSIX excludes repo-only status and build metadata.
-- Current testable VSIX: `simple-lsp-client-0.1.8.vsix`.
+- Current testable VSIX: `simple-lsp-client-0.1.10.vsix`.
 - Fixed executable server startup so no `--stdio` flag is injected by `vscode-languageclient`.
 - Server status can be shown with `Simple LSP Client: Show Status`.
 - Configured servers and formatters can be listed separately from the command palette.

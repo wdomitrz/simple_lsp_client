@@ -69,7 +69,8 @@ restricting the document URI scheme.
 
 Server and formatter processes also receive matching `SIMPLE_LSP_CLIENT_*`
 environment variables for the workspace, cwd, user home, path separator, and VS
-Code executable path.
+Code executable path. Workspace environment values are empty when no workspace is
+open.
 
 When a workspace is open, server processes use the first workspace folder as
 their working directory.
