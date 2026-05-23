@@ -46,6 +46,9 @@
 - [x] Fix status output so configured formatters are shown even without active LSP clients.
 - [x] Register formatters by language without restricting document URI scheme.
 - [x] Add commands to list configured servers and configured formatters.
+- [x] Collapse implementation back into one TypeScript file.
+- [x] Add VS Code-style variable expansion for commands and environment values.
+- [x] Add command to list available variable values.
 
 ## Notes
 
@@ -55,7 +58,7 @@
 - All servers are assumed to use stdio.
 - Runtime config validation is intentionally minimal and only checks non-empty `cmd` and `filetypes` arrays.
 - The generated VSIX excludes repo-only status and build metadata.
-- Current testable VSIX: `simple-lsp-client-0.1.3.vsix`.
+- Current testable VSIX: `simple-lsp-client-0.1.4.vsix`.
 - Fixed executable server startup so no `--stdio` flag is injected by `vscode-languageclient`.
 - Server status can be shown with `Simple LSP Client: Show Status`.
 - Configured servers and formatters can be listed separately from the command palette.
@@ -68,7 +71,10 @@
 - Servers start lazily for matching open documents and are not stopped on close.
 - Formatters always read document text from stdin and write formatted text to stdout.
 - Formatter providers are registered for matching language IDs across URI schemes; LSP clients remain limited to `file` and `untitled`.
-- Source is split into focused modules for configuration, document helpers, LSP clients, formatters, output, status, and shared types.
+- Source is kept in one TypeScript file with focused sections.
+- Server and formatter `cmd` entries and `env` values support `${workspaceFolder}`, `${workspaceFolderBasename}`, `${cwd}`, `${userHome}`, `${pathSeparator}`, and `${execPath}`.
+- Formatter commands additionally support `${file}` and `${filetype}`.
+- Server and formatter processes receive `SIMPLE_LSP_CLIENT_*` environment variables for the same workspace/process context.
 
 ## Manual Verification
 

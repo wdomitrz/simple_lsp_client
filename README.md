@@ -48,6 +48,19 @@ to stdout. Formatter commands support `${file}` and `${filetype}` placeholders
 inside `cmd`. Unlike LSP clients, formatters are registered by language ID
 without restricting the document URI scheme.
 
+Commands and `env` values support these variables:
+
+- `${workspaceFolder}`
+- `${workspaceFolderBasename}`
+- `${cwd}`
+- `${userHome}`
+- `${pathSeparator}`
+- `${execPath}`
+
+Formatters also support `${file}` and `${filetype}`. Server and formatter
+processes also receive matching `SIMPLE_LSP_CLIENT_*` environment variables for
+the workspace, cwd, user home, path separator, and VS Code executable path.
+
 When a workspace is open, server processes use the first workspace folder as
 their working directory.
 
@@ -107,6 +120,7 @@ Example with environment and initialization options:
 - `Simple LSP Client: Show Status`
 - `Simple LSP Client: List Configured Servers`
 - `Simple LSP Client: List Configured Formatters`
+- `Simple LSP Client: List Variables`
 
 ## Behavior
 

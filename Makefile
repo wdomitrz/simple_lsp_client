@@ -18,7 +18,7 @@ test:
 compile:
 	npm run compile
 
-vsix:
+vsix: clean
 	npm run package
 
 clean:
