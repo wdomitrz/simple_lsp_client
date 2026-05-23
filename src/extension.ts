@@ -252,10 +252,13 @@ async function startClient(config: NamedServerConfig): Promise<void> {
     `Starting ${config.name}: ${[command, ...args].join(" ")}${formatWorkspaceFolder(workspaceFolder)}`,
   );
   startingClientNames.add(config.name);
+  activeClients.push({ config, client, workspaceFolder });
   try {
     await client.start();
-    activeClients.push({ config, client, workspaceFolder });
   } catch (error) {
+    activeClients = activeClients.filter(
+      (activeClient) => activeClient.client !== client,
+    );
     appendOutputLine(
       `Failed to start LSP client "${config.name}": ${formatError(error)}`,
     );
@@ -511,13 +514,11 @@ function readFormatterConfigs(): NamedFormatterConfig[] {
   });
 }
 
-function readConfigObject<T>(
+function readConfigObject<T extends object>(
   key: string,
   configKind: "LSP server" | "formatter",
 ): Record<string, T> {
-  const value = workspace
-    .getConfiguration(configSection)
-    .get<Record<string, T> | null>(key, {});
+  const value = workspace.getConfiguration(configSection).get<unknown>(key, {});
 
   if (!isPlainObject(value)) {
     appendOutputLine(
@@ -526,30 +527,42 @@ function readConfigObject<T>(
     return {};
   }
 
-  return value;
+  return value as Record<string, T>;
 }
 
-function isPlainObject(value: object | null): value is Record<string, object> {
-  return value !== null && !Array.isArray(value);
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function isValidServerConfig(config: RawServerConfig): config is ServerConfig {
+function isValidServerConfig(config: unknown): config is ServerConfig {
   return isValidProcessConfig(config);
 }
 
-function isValidProcessConfig(
-  config: RawProcessConfig,
-): config is ProcessConfig {
+function isValidProcessConfig(config: unknown): config is ProcessConfig {
+  if (!isPlainObject(config)) {
+    return false;
+  }
+
   return (
-    config.cmd !== undefined &&
-    config.filetypes !== undefined &&
     isNonEmptyStringArray(config.cmd) &&
-    isNonEmptyStringArray(config.filetypes)
+    isNonEmptyStringArray(config.filetypes) &&
+    (config.env === undefined || isStringRecord(config.env))
   );
 }
 
-function isNonEmptyStringArray(value: string[]): value is NonEmptyStringArray {
-  return value.length > 0 && value.every((item) => item.length > 0);
+function isNonEmptyStringArray(value: unknown): value is NonEmptyStringArray {
+  return (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.every((item) => typeof item === "string" && item.length > 0)
+  );
+}
+
+function isStringRecord(value: unknown): value is Record<string, string> {
+  return (
+    isPlainObject(value) &&
+    Object.values(value).every((item) => typeof item === "string")
+  );
 }
 
 function createLspDocumentSelector(
