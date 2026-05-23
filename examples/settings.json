@@ -12,5 +12,15 @@
       "cmd": ["clangd"],
       "filetypes": ["c", "cpp", "objective-c", "objective-cpp"]
     }
+  },
+  "simpleLspClient.formatters": {
+    "prettier": {
+      "cmd": ["prettier", "--stdin-filepath", "${file}"],
+      "filetypes": ["javascript", "typescript", "json", "markdown"]
+    },
+    "clang-format": {
+      "cmd": ["clang-format", "--assume-filename", "${file}"],
+      "filetypes": ["c", "cpp", "objective-c", "objective-cpp"]
+    }
   }
 }

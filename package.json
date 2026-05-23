@@ -2,7 +2,7 @@
   "name": "simple-lsp-client",
   "displayName": "Simple LSP Client",
   "description": "A configurable VS Code LSP client extension.",
-  "version": "0.0.1",
+  "version": "0.1.3",
   "publisher": "wdomitrz",
   "license": "AGPL-3.0-only",
   "homepage": "https://github.com/wdomitrz/simple_lsp_client#readme",
@@ -50,6 +50,14 @@
       {
         "command": "simpleLspClient.showStatus",
         "title": "Simple LSP Client: Show Status"
+      },
+      {
+        "command": "simpleLspClient.listConfiguredServers",
+        "title": "Simple LSP Client: List Configured Servers"
+      },
+      {
+        "command": "simpleLspClient.listConfiguredFormatters",
+        "title": "Simple LSP Client: List Configured Formatters"
       }
     ],
     "configuration": {
@@ -114,6 +122,61 @@
                 ],
                 "filetypes": [
                   "python"
+                ]
+              }
+            }
+          ]
+        },
+        "simpleLspClient.formatters": {
+          "type": "object",
+          "default": {},
+          "markdownDescription": "Named stdin/stdout formatters to register. Each key is a formatter name.",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "cmd",
+              "filetypes"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "cmd": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "markdownDescription": "Command and arguments used to format stdin into stdout. Supports `${file}` and `${filetype}` placeholders."
+              },
+              "filetypes": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "markdownDescription": "VS Code language IDs this formatter should attach to."
+              },
+              "env": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "markdownDescription": "Environment variables to add or override for the formatter process."
+              }
+            }
+          },
+          "examples": [
+            {
+              "prettier": {
+                "cmd": [
+                  "prettier",
+                  "--stdin-filepath",
+                  "${file}"
+                ],
+                "filetypes": [
+                  "javascript",
+                  "typescript"
                 ]
               }
             }

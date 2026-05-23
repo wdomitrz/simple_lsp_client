@@ -37,24 +37,38 @@
 - [x] Start servers only when a matching document is open.
 - [x] Start newly relevant servers on document open.
 - [x] Keep servers running after matching documents close.
+- [x] Add `simpleLspClient.formatters` configuration.
+- [x] Register external stdin/stdout document formatters by filetype.
+- [x] Support formatter `${file}` and `${filetype}` command placeholders.
+- [x] Run final verification after formatter support.
+- [x] Bump package version and rebuild VSIX.
+- [x] Split implementation into focused ES modules.
+- [x] Fix status output so configured formatters are shown even without active LSP clients.
+- [x] Register formatters by language without restricting document URI scheme.
+- [x] Add commands to list configured servers and configured formatters.
 
 ## Notes
 
 - `simpleLspClient.servers` is an object keyed by server name.
-- Each server currently supports `cmd` and `filetypes`.
+- Each server supports `cmd`, `filetypes`, optional `env`, and optional `initializationOptions`.
+- Each formatter supports `cmd`, `filetypes`, and optional `env`.
 - All servers are assumed to use stdio.
-- Runtime config validation was removed by design; the extension assumes settings match the contributed schema.
+- Runtime config validation is intentionally minimal and only checks non-empty `cmd` and `filetypes` arrays.
 - The generated VSIX excludes repo-only status and build metadata.
-- First testable VSIX: `simple-lsp-client-0.0.1.vsix`.
+- Current testable VSIX: `simple-lsp-client-0.1.3.vsix`.
 - Fixed executable server startup so no `--stdio` flag is injected by `vscode-languageclient`.
 - Server status can be shown with `Simple LSP Client: Show Status`.
+- Configured servers and formatters can be listed separately from the command palette.
 - Server processes use the first VS Code workspace folder as `cwd` when available.
-- Activation now uses generic `onLanguage` plus command activation instead of `onStartupFinished`.
+- Activation now uses generic `onLanguage` instead of `onStartupFinished`.
 - Explicit command activation events were removed; modern VS Code activates contributed commands automatically.
 - Server config now supports optional `env` and `initializationOptions`.
 - Restart operations are serialized to avoid duplicate clients.
 - Server startup failures are isolated and do not block other configured servers.
 - Servers start lazily for matching open documents and are not stopped on close.
+- Formatters always read document text from stdin and write formatted text to stdout.
+- Formatter providers are registered for matching language IDs across URI schemes; LSP clients remain limited to `file` and `untitled`.
+- Source is split into focused modules for configuration, document helpers, LSP clients, formatters, output, status, and shared types.
 
 ## Manual Verification
 

@@ -17,15 +17,36 @@ Configure `simpleLspClient.servers` as an object keyed by server name:
 }
 ```
 
-Each server supports:
+Configure `simpleLspClient.formatters` the same way for stdin/stdout formatters:
+
+```json
+{
+  "simpleLspClient.formatters": {
+    "prettier": {
+      "cmd": ["prettier", "--stdin-filepath", "${file}"],
+      "filetypes": ["javascript", "typescript"]
+    }
+  }
+}
+```
+
+Each server and formatter supports:
 
 - `cmd`: exact command and arguments to run.
 - `filetypes`: VS Code language IDs to attach to.
 - `env`: optional environment variables for the server process.
+
+Servers also support:
+
 - `initializationOptions`: optional JSON value passed in the LSP initialize request.
 
 The extension does not add transport flags like `--stdio`. Put only the
 arguments your server expects in `cmd`.
+
+Formatters always receive document text on stdin and must write formatted text
+to stdout. Formatter commands support `${file}` and `${filetype}` placeholders
+inside `cmd`. Unlike LSP clients, formatters are registered by language ID
+without restricting the document URI scheme.
 
 When a workspace is open, server processes use the first workspace folder as
 their working directory.
@@ -45,6 +66,16 @@ their working directory.
     },
     "clangd": {
       "cmd": ["clangd"],
+      "filetypes": ["c", "cpp", "objective-c", "objective-cpp"]
+    }
+  },
+  "simpleLspClient.formatters": {
+    "prettier": {
+      "cmd": ["prettier", "--stdin-filepath", "${file}"],
+      "filetypes": ["javascript", "typescript", "json", "markdown"]
+    },
+    "clang-format": {
+      "cmd": ["clang-format", "--assume-filename", "${file}"],
       "filetypes": ["c", "cpp", "objective-c", "objective-cpp"]
     }
   }
@@ -74,6 +105,8 @@ Example with environment and initialization options:
 
 - `Simple LSP Client: Restart Servers`
 - `Simple LSP Client: Show Status`
+- `Simple LSP Client: List Configured Servers`
+- `Simple LSP Client: List Configured Formatters`
 
 ## Behavior
 
