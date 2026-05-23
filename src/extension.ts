@@ -89,6 +89,8 @@ interface FormatterVariableValues extends VariableValues {
   relativeFile: string;
 }
 
+type ExpansionVariables = VariableValues | FormatterVariableValues;
+
 const configSection = "simpleLspClient";
 const serversConfigKey = "servers";
 const formattersConfigKey = "formatters";
@@ -427,9 +429,10 @@ function runFormatterProcess(
 }
 
 function readServerConfigs(): NamedServerConfig[] {
-  const servers = workspace
-    .getConfiguration(configSection)
-    .get<Record<string, RawServerConfig>>(serversConfigKey, {});
+  const servers = readConfigObject<RawServerConfig>(
+    serversConfigKey,
+    "LSP server",
+  );
 
   return Object.entries(servers).flatMap(([name, config]) => {
     if (isValidServerConfig(config)) {
@@ -444,9 +447,10 @@ function readServerConfigs(): NamedServerConfig[] {
 }
 
 function readFormatterConfigs(): NamedFormatterConfig[] {
-  const formatters = workspace
-    .getConfiguration(configSection)
-    .get<Record<string, RawFormatterConfig>>(formattersConfigKey, {});
+  const formatters = readConfigObject<RawFormatterConfig>(
+    formattersConfigKey,
+    "formatter",
+  );
 
   return Object.entries(formatters).flatMap(([name, config]) => {
     if (isValidProcessConfig(config)) {
@@ -458,6 +462,28 @@ function readFormatterConfigs(): NamedFormatterConfig[] {
     );
     return [];
   });
+}
+
+function readConfigObject<T>(
+  key: string,
+  configKind: "LSP server" | "formatter",
+): Record<string, T> {
+  const value = workspace
+    .getConfiguration(configSection)
+    .get<Record<string, T> | null>(key, {});
+
+  if (!isPlainObject(value)) {
+    appendOutputLine(
+      `Skipping ${configKind} configuration. Expected an object keyed by name.`,
+    );
+    return {};
+  }
+
+  return value;
+}
+
+function isPlainObject(value: object | null): value is Record<string, object> {
+  return value !== null && !Array.isArray(value);
 }
 
 function isValidServerConfig(config: RawServerConfig): config is ServerConfig {
@@ -556,7 +582,7 @@ function getRelativeFileName(
 
 function expandCommand(
   command: NonEmptyStringArray,
-  variables: Record<string, string>,
+  variables: ExpansionVariables,
 ): NonEmptyStringArray {
   const [executable, ...args] = command;
   return [
@@ -567,7 +593,7 @@ function expandCommand(
 
 function createProcessEnv(
   configuredEnv: Record<string, string> | undefined,
-  variables: VariableValues,
+  variables: ExpansionVariables,
 ): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = {
     ...process.env,
@@ -590,10 +616,7 @@ function createProcessEnv(
   return env;
 }
 
-function expandVariables(
-  value: string,
-  variables: Record<string, string>,
-): string {
+function expandVariables(value: string, variables: ExpansionVariables): string {
   let expanded = value;
 
   for (const [name, replacement] of Object.entries(variables)) {
@@ -669,6 +692,7 @@ function listVariables(): void {
   channel.appendLine("- SIMPLE_LSP_CLIENT_EXEC_PATH");
   channel.appendLine("");
   channel.appendLine("Formatter-only variables:");
+  channel.appendLine("These are resolved from the document being formatted.");
   channel.appendLine("- ${file}");
   channel.appendLine("- ${relativeFile}");
   channel.appendLine("- ${filetype}");

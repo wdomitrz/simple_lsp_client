@@ -52,6 +52,9 @@
 - [x] Add formatter `${relativeFile}` placeholder.
 - [x] Add README manual test checklist.
 - [x] Polish marketplace metadata before packaging.
+- [x] Clarify formatter-only variables in `List Variables`.
+- [x] Add top-level config guards for malformed server/formatter settings.
+- [x] Tighten variable expansion typing for server and formatter env values.
 
 ## Notes
 
@@ -61,7 +64,7 @@
 - All servers are assumed to use stdio.
 - Runtime config validation is intentionally minimal and only checks non-empty `cmd` and `filetypes` arrays.
 - The generated VSIX excludes repo-only status and build metadata.
-- Current testable VSIX: `simple-lsp-client-0.1.5.vsix`.
+- Current testable VSIX: `simple-lsp-client-0.1.6.vsix`.
 - Fixed executable server startup so no `--stdio` flag is injected by `vscode-languageclient`.
 - Server status can be shown with `Simple LSP Client: Show Status`.
 - Configured servers and formatters can be listed separately from the command palette.
