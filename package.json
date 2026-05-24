@@ -2,7 +2,7 @@
   "name": "simple-lsp-client",
   "displayName": "Simple LSP Client",
   "description": "Run configured stdio LSP servers and stdin/stdout formatters.",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "publisher": "wdomitrz",
   "license": "AGPL-3.0-only",
   "homepage": "https://github.com/wdomitrz/simple_lsp_client#readme",
@@ -18,7 +18,6 @@
     "clangd"
   ],
   "qna": false,
-  "preview": true,
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/wdomitrz/simple_lsp_client.git"
