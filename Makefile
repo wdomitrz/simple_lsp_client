@@ -1,4 +1,4 @@
-.PHONY: install format format-check lint test check compile vsix publish clean
+.PHONY: install format format-check lint test check compile vsix publish publish-open-vsx clean
 
 install:
 	npm install
@@ -25,6 +25,9 @@ vsix: clean
 
 publish: check
 	npm run publish:extension
+
+publish-open-vsx: check vsix
+	npm run publish:open-vsx -- --packagePath *.vsix
 
 clean:
 	rm -rf dist *.vsix

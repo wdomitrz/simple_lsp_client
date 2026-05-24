@@ -76,6 +76,7 @@
 - [x] Use `package.json` version for master-push release tag and name.
 - [x] Avoid overwriting existing GitHub release assets.
 - [x] Publish extension from GitHub Actions using `VSCE_PAT`.
+- [x] Publish extension to Open VSX from GitHub Actions using `OVSX_PAT`.
 
 ## Notes
 

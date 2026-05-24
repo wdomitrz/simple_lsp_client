@@ -47,3 +47,8 @@ jobs:
         run: npm run publish:extension
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
+      - name: Publish to Open VSX
+        run: npm run publish:open-vsx -- --packagePath *.vsix
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
