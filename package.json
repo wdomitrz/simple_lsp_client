@@ -1,5 +1,6 @@
 {
   "name": "simple-lsp-client",
+  "displayName": "Simple LSP Client",
   "version": "0.1.12",
   "publisher": "wdomitrz",
   "license": "AGPL-3.0-only",
