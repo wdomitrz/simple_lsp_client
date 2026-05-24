@@ -39,5 +39,6 @@ jobs:
           tag_name: v${{ steps.get_version.outputs.ext_version }}
           name: Release v${{ steps.get_version.outputs.ext_version }}
           files: "*.vsix"
+          overwrite_files: false
           draft: false
           prerelease: false
