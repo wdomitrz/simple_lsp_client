@@ -69,6 +69,11 @@
 - [x] Bump package version after metadata simplification.
 - [x] Add `make publish` with dependency bundling disabled.
 - [x] Bump package version after publish-target cleanup.
+- [x] Make master-push GitHub releases use the package version without requiring a pre-existing tag.
+- [x] Show effective LSP formatting state in status output.
+- [x] Serialize document-open client starts with restart operations.
+- [x] Bump package version after review fixes.
+- [x] Use `package.json` version for master-push release tag and name.
 
 ## Notes
 
@@ -78,7 +83,6 @@
 - All servers are assumed to use stdio.
 - Runtime config validation is intentionally minimal and only checks non-empty `cmd` and `filetypes` arrays.
 - The generated VSIX excludes repo-only status and build metadata.
-- Current testable VSIX: `simple-lsp-client-0.1.10.vsix`.
 - Fixed executable server startup so no `--stdio` flag is injected by `vscode-languageclient`.
 - Server status can be shown with `Simple LSP Client: Show Status`.
 - Configured servers and formatters can be listed separately from the command palette.

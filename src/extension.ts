@@ -130,7 +130,7 @@ let outputChannel: OutputChannel | undefined;
 let activeClients: ActiveClient[] = [];
 let startingClientNames = new Set<string>();
 let formatterDisposables: Disposable[] = [];
-let restartQueue: Promise<void> = Promise.resolve();
+let clientOperationQueue: Promise<void> = Promise.resolve();
 
 export function activate(context: ExtensionContext): void {
   outputChannel = window.createOutputChannel(outputChannelName);
@@ -195,8 +195,12 @@ function appendOutputLine(message: string): void {
 }
 
 function queueRestartClients(): Promise<void> {
-  restartQueue = restartQueue.then(restartClients, restartClients);
-  return restartQueue;
+  return queueClientOperation(restartClients);
+}
+
+function queueClientOperation(operation: () => Promise<void>): Promise<void> {
+  clientOperationQueue = clientOperationQueue.then(operation, operation);
+  return clientOperationQueue;
 }
 
 async function restartClients(): Promise<void> {
@@ -241,8 +245,14 @@ async function startClientsForDocument(document: TextDocument): Promise<void> {
     return;
   }
 
-  await restartQueue;
+  await queueClientOperation(async () => {
+    await startMissingClientsForDocument(document);
+  });
+}
 
+async function startMissingClientsForDocument(
+  document: TextDocument,
+): Promise<void> {
   const servers = readServerConfigs().filter(
     (server) =>
       serverMatchesDocument(server, document) && shouldStartServer(server.name),
@@ -832,7 +842,7 @@ function getClientStatusLines(): string[] {
 
   return activeClients.map(
     ({ client, config, workspaceFolder }) =>
-      `- ${config.name}: ${formatState(client.state)}; cmd=${config.cmd.join(" ")}; filetypes=${config.filetypes.join(", ")}; formatting=${formatFormattingPolicy(config.formatting)}${formatWorkspaceFolder(workspaceFolder)}`,
+      `- ${config.name}: ${formatState(client.state)}; cmd=${config.cmd.join(" ")}; filetypes=${config.filetypes.join(", ")}; formatting=${formatEffectiveFormatting(config)}${formatWorkspaceFolder(workspaceFolder)}`,
   );
 }
 
@@ -862,6 +872,11 @@ function formatFormattingPolicy(
   formatting: FormattingPolicy | undefined,
 ): string {
   return String(formatting ?? defaultFormattingPolicy);
+}
+
+function formatEffectiveFormatting(config: NamedServerConfig): string {
+  const state = shouldSuppressLspFormatting(config) ? "suppressed" : "enabled";
+  return `${state} (${formatFormattingPolicy(config.formatting)})`;
 }
 
 function formatWorkspaceFolder(
