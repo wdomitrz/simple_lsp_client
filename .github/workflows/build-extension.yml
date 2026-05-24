@@ -9,6 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # Grants the workflow permission to create and write to GitHub Releases
+    permissions:
+      contents: write
+
     steps:
       - uses: actions/checkout@v4
 
@@ -22,8 +26,19 @@ jobs:
       - name: Build VSIX Package
         run: make vsix
 
-      - uses: actions/upload-artifact@v4
+      # Reads the version field from your package.json to name the release
+      - name: Get Extension Version
+        id: get_version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "ext_version=$VERSION" >> $GITHUB_OUTPUT
+
+      # Uploads the raw .vsix directly to a Release
+      - name: Upload to GitHub Releases
+        uses: softprops/action-gh-release@v2
         with:
-          name: vscode-extension-vsix
-          path: "*.vsix"
-          if-no-files-found: error
+          tag_name: v${{ steps.get_version.outputs.ext_version }}
+          name: Release v${{ steps.get_version.outputs.ext_version }}
+          files: "*.vsix"
+          draft: false
+          prerelease: false
