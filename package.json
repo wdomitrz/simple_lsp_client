@@ -1,7 +1,7 @@
 {
   "name": "simple-lsp-client",
   "displayName": "Simple LSP Client",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "publisher": "wdomitrz",
   "license": "AGPL-3.0-only",
   "homepage": "https://github.com/wdomitrz/simple_lsp_client",

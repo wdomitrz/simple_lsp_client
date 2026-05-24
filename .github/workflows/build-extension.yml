@@ -42,3 +42,8 @@ jobs:
           overwrite_files: false
           draft: false
           prerelease: false
+
+      - name: Publish to Visual Studio Marketplace
+        run: npm run publish:extension
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}

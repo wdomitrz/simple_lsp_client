@@ -75,6 +75,7 @@
 - [x] Bump package version after review fixes.
 - [x] Use `package.json` version for master-push release tag and name.
 - [x] Avoid overwriting existing GitHub release assets.
+- [x] Publish extension from GitHub Actions using `VSCE_PAT`.
 
 ## Notes
 
