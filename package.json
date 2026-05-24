@@ -1,30 +1,22 @@
 {
   "name": "simple-lsp-client",
-  "displayName": "Simple LSP Client",
-  "description": "Run configured stdio LSP servers and stdin/stdout formatters.",
   "version": "0.1.12",
   "publisher": "wdomitrz",
   "license": "AGPL-3.0-only",
-  "homepage": "https://github.com/wdomitrz/simple_lsp_client#readme",
-  "bugs": { "url": "https://github.com/wdomitrz/simple_lsp_client/issues" },
+  "homepage": "https://github.com/wdomitrz/simple_lsp_client",
   "keywords": [
     "lsp",
     "language-server",
     "language-client",
     "formatter",
-    "formatting",
-    "ruff",
-    "basedpyright",
-    "clangd"
+    "formatting"
   ],
-  "qna": false,
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/wdomitrz/simple_lsp_client.git"
   },
   "engines": { "vscode": "^1.100.0" },
   "categories": ["Programming Languages", "Formatters", "Linters", "Other"],
-  "galleryBanner": { "color": "#1f2937", "theme": "dark" },
   "extensionKind": ["workspace"],
   "activationEvents": ["onLanguage"],
   "contributes": {
