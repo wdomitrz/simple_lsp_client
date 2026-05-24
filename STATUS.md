@@ -67,6 +67,8 @@
 - [x] Simplify LSP formatting suppression so disabled LSP formatters are not registered.
 - [x] Simplify package metadata and VSIX contents.
 - [x] Bump package version after metadata simplification.
+- [x] Add `make publish` with dependency bundling disabled.
+- [x] Bump package version after publish-target cleanup.
 
 ## Notes
 

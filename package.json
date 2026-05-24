@@ -1,7 +1,7 @@
 {
   "name": "simple-lsp-client",
   "displayName": "Simple LSP Client",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "publisher": "wdomitrz",
   "license": "AGPL-3.0-only",
   "homepage": "https://github.com/wdomitrz/simple_lsp_client",
@@ -202,7 +202,8 @@
     "format": "prettier --write package.json package-lock.json tsconfig.json eslint.config.mjs .prettierrc.json README.md STATUS.md examples/**/*.json src/**/*.ts",
     "format:check": "prettier --check package.json package-lock.json tsconfig.json eslint.config.mjs .prettierrc.json README.md STATUS.md examples/**/*.json src/**/*.ts",
     "test": "npm run compile",
-    "package": "vsce package --no-dependencies"
+    "package": "vsce package --no-dependencies",
+    "publish:extension": "vsce publish --no-dependencies"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
