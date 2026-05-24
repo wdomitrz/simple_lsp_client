@@ -2,14 +2,13 @@ name: Build and Package Extension
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    # Grants the workflow permission to create and write to GitHub Releases
     permissions:
       contents: write
 
@@ -18,22 +17,22 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
-          cache: 'npm'
+          node-version: "24"
+          cache: "npm"
 
-      - run: make
+      - run: npm ci
 
-      - name: Build VSIX Package
+      - run: make check
+
+      - name: Build VSIX package
         run: make vsix
 
-      # Reads the version field from your package.json to name the release
-      - name: Get Extension Version
+      - name: Get extension version
         id: get_version
         run: |
-          VERSION=$(node -p "require('./package.json').version")
-          echo "ext_version=$VERSION" >> $GITHUB_OUTPUT
+          version=$(node -p "require('./package.json').version")
+          echo "ext_version=$version" >> "$GITHUB_OUTPUT"
 
-      # Uploads the raw .vsix directly to a Release
       - name: Upload to GitHub Releases
         uses: softprops/action-gh-release@v2
         with:

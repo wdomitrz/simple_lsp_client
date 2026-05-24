@@ -1,20 +1,18 @@
 {
   "name": "simple-lsp-client",
   "displayName": "Simple LSP Client",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "publisher": "wdomitrz",
   "license": "AGPL-3.0-only",
   "homepage": "https://github.com/wdomitrz/simple_lsp_client",
   "keywords": [
     "lsp",
     "language-server",
-    "language-client",
-    "formatter",
-    "formatting"
+    "formatter"
   ],
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/wdomitrz/simple_lsp_client.git"
+    "url": "https://github.com/wdomitrz/simple_lsp_client.git"
   },
   "engines": {
     "vscode": "^1.100.0"
@@ -22,8 +20,7 @@
   "categories": [
     "Programming Languages",
     "Formatters",
-    "Linters",
-    "Other"
+    "Linters"
   ],
   "extensionKind": [
     "workspace"

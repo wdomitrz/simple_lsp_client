@@ -65,6 +65,8 @@
 - [x] Add per-server LSP formatting policy.
 - [x] Bump package version after formatting policy change.
 - [x] Simplify LSP formatting suppression so disabled LSP formatters are not registered.
+- [x] Simplify package metadata and VSIX contents.
+- [x] Bump package version after metadata simplification.
 
 ## Notes
 

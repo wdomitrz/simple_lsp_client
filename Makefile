@@ -1,4 +1,4 @@
-.PHONY: install format format-check lint test compile vsix clean
+.PHONY: install format format-check lint test check compile vsix clean
 
 install:
 	npm install
@@ -14,6 +14,8 @@ lint:
 
 test:
 	npm test
+
+check: format-check lint test
 
 compile:
 	npm run compile
