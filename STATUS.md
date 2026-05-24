@@ -62,6 +62,9 @@
 - [x] Keep LSP clients tracked when stop fails, avoiding duplicate restart clients.
 - [x] Remove unnecessary formatter timeout maximum.
 - [x] Always expose `SIMPLE_LSP_CLIENT_WORKSPACE_*` env variables, using empty values without a workspace.
+- [x] Add per-server LSP formatting policy.
+- [x] Bump package version after formatting policy change.
+- [x] Simplify LSP formatting suppression so disabled LSP formatters are not registered.
 
 ## Notes
 
@@ -89,6 +92,8 @@
 - Formatter commands and env values additionally support `${file}`, `${relativeFile}`, and `${filetype}`.
 - Server and formatter processes receive `SIMPLE_LSP_CLIENT_*` environment variables for the same workspace/process context.
 - `simpleLspClient.formatterTimeoutMs` defaults to 30000; 0 disables formatter timeout.
+- Server `formatting` defaults to `onlyWhenNoFormatter`; use `true` to allow LSP formatting or `false` to suppress it.
+- LSP formatting suppression is per server, not per document language.
 
 ## Manual Verification
 

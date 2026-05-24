@@ -16,6 +16,9 @@ import {
   type WorkspaceFolder,
 } from "vscode";
 import {
+  DocumentFormattingRequest,
+  DocumentOnTypeFormattingRequest,
+  DocumentRangeFormattingRequest,
   LanguageClient,
   State,
   type LanguageClientOptions,
@@ -44,6 +47,8 @@ interface ProcessConfig {
   env?: Record<string, string>;
 }
 
+type FormattingPolicy = boolean | "onlyWhenNoFormatter";
+
 interface RawProcessConfig {
   cmd?: string[];
   filetypes?: string[];
@@ -52,10 +57,12 @@ interface RawProcessConfig {
 
 interface ServerConfig extends ProcessConfig {
   initializationOptions?: JsonValue;
+  formatting?: FormattingPolicy;
 }
 
 interface RawServerConfig extends RawProcessConfig {
   initializationOptions?: JsonValue;
+  formatting?: FormattingPolicy;
 }
 
 type RawFormatterConfig = RawProcessConfig;
@@ -97,6 +104,27 @@ const formattersConfigKey = "formatters";
 const formatterTimeoutMsConfigKey = "formatterTimeoutMs";
 const outputChannelName = "Simple LSP Client";
 const defaultFormatterTimeoutMs = 30_000;
+const defaultFormattingPolicy: FormattingPolicy = "onlyWhenNoFormatter";
+const formattingMethods = new Set<string>([
+  DocumentFormattingRequest.method,
+  DocumentRangeFormattingRequest.method,
+  DocumentOnTypeFormattingRequest.method,
+]);
+
+class NoFormattingLanguageClient extends LanguageClient {
+  override registerFeature(
+    feature: Parameters<LanguageClient["registerFeature"]>[0],
+  ): void {
+    if (
+      "registrationType" in feature &&
+      formattingMethods.has(feature.registrationType.method)
+    ) {
+      return;
+    }
+
+    super.registerFeature(feature);
+  }
+}
 
 let outputChannel: OutputChannel | undefined;
 let activeClients: ActiveClient[] = [];
@@ -135,9 +163,10 @@ export function activate(context: ExtensionContext): void {
         event.affectsConfiguration(`${configSection}.${formattersConfigKey}`)
       ) {
         appendOutputLine(
-          "Formatter configuration changed; reloading formatters.",
+          "Formatter configuration changed; reloading formatters and restarting LSP clients.",
         );
         reloadFormatters();
+        void queueRestartClients();
       }
     }),
     workspace.onDidOpenTextDocument((document) => {
@@ -238,6 +267,7 @@ async function startClient(config: NamedServerConfig): Promise<void> {
     documentSelector: createLspDocumentSelector(config.filetypes),
     outputChannel: getOutputChannel(),
   };
+  const suppressFormatting = shouldSuppressLspFormatting(config);
 
   if (workspaceFolder !== undefined) {
     clientOptions.workspaceFolder = workspaceFolder;
@@ -247,7 +277,10 @@ async function startClient(config: NamedServerConfig): Promise<void> {
     clientOptions.initializationOptions = config.initializationOptions;
   }
 
-  const client = new LanguageClient(
+  const ClientConstructor = suppressFormatting
+    ? NoFormattingLanguageClient
+    : LanguageClient;
+  const client = new ClientConstructor(
     `simple-lsp-client.${config.name}`,
     `Simple LSP Client: ${config.name}`,
     serverOptions,
@@ -255,7 +288,7 @@ async function startClient(config: NamedServerConfig): Promise<void> {
   );
 
   appendOutputLine(
-    `Starting ${config.name}: ${[command, ...args].join(" ")}${formatWorkspaceFolder(workspaceFolder)}`,
+    `Starting ${config.name}: ${[command, ...args].join(" ")}; formatting=${suppressFormatting ? "suppressed" : "enabled"}${formatWorkspaceFolder(workspaceFolder)}`,
   );
   startingClientNames.add(config.name);
   activeClients.push({ config, client, workspaceFolder });
@@ -308,6 +341,28 @@ function serverMatchesDocument(
     isSupportedLspDocument(document) &&
     server.filetypes.includes(document.languageId)
   );
+}
+
+function shouldSuppressLspFormatting(config: NamedServerConfig): boolean {
+  const formatting = config.formatting ?? defaultFormattingPolicy;
+
+  if (formatting === true) {
+    return false;
+  }
+
+  if (formatting === false) {
+    return true;
+  }
+
+  return hasOverlappingFormatter(config);
+}
+
+function hasOverlappingFormatter(config: NamedServerConfig): boolean {
+  const formatterFiletypes = new Set(
+    readFormatterConfigs().flatMap((formatter) => formatter.filetypes),
+  );
+
+  return config.filetypes.some((filetype) => formatterFiletypes.has(filetype));
 }
 
 function reloadFormatters(): void {
@@ -541,7 +596,15 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 }
 
 function isValidServerConfig(config: unknown): config is ServerConfig {
-  return isValidProcessConfig(config);
+  return (
+    isValidProcessConfig(config) &&
+    isPlainObject(config) &&
+    (config.formatting === undefined || isFormattingPolicy(config.formatting))
+  );
+}
+
+function isFormattingPolicy(value: unknown): value is FormattingPolicy {
+  return value === true || value === false || value === "onlyWhenNoFormatter";
 }
 
 function isValidProcessConfig(config: unknown): config is ProcessConfig {
@@ -769,7 +832,7 @@ function getClientStatusLines(): string[] {
 
   return activeClients.map(
     ({ client, config, workspaceFolder }) =>
-      `- ${config.name}: ${formatState(client.state)}; cmd=${config.cmd.join(" ")}; filetypes=${config.filetypes.join(", ")}${formatWorkspaceFolder(workspaceFolder)}`,
+      `- ${config.name}: ${formatState(client.state)}; cmd=${config.cmd.join(" ")}; filetypes=${config.filetypes.join(", ")}; formatting=${formatFormattingPolicy(config.formatting)}${formatWorkspaceFolder(workspaceFolder)}`,
   );
 }
 
@@ -793,6 +856,12 @@ function formatState(state: State): string {
     case State.Stopped:
       return "stopped";
   }
+}
+
+function formatFormattingPolicy(
+  formatting: FormattingPolicy | undefined,
+): string {
+  return String(formatting ?? defaultFormattingPolicy);
 }
 
 function formatWorkspaceFolder(

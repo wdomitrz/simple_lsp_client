@@ -2,7 +2,8 @@
   "simpleLspClient.servers": {
     "ruff": {
       "cmd": ["ruff", "server"],
-      "filetypes": ["python"]
+      "filetypes": ["python"],
+      "formatting": "onlyWhenNoFormatter"
     },
     "basedpyright": {
       "cmd": ["basedpyright-langserver", "--stdio"],

@@ -40,6 +40,17 @@ Each server and formatter supports:
 Servers also support:
 
 - `initializationOptions`: optional JSON value passed in the LSP initialize request.
+- `formatting`: optional LSP formatting policy. Defaults to `"onlyWhenNoFormatter"`.
+
+Server formatting policy:
+
+- `true`: allow the LSP server to format.
+- `false`: suppress formatting from this LSP server.
+- `"onlyWhenNoFormatter"`: suppress formatting from this LSP server when an external formatter is configured for any overlapping filetype.
+
+Formatting suppression is per LSP server. If one configured formatter overlaps a
+multi-language LSP server, that LSP server's formatting provider is not
+registered.
 
 Global formatter setting:
 
@@ -82,7 +93,8 @@ their working directory.
   "simpleLspClient.servers": {
     "ruff": {
       "cmd": ["ruff", "server"],
-      "filetypes": ["python"]
+      "filetypes": ["python"],
+      "formatting": "onlyWhenNoFormatter"
     },
     "basedpyright": {
       "cmd": ["basedpyright-langserver", "--stdio"],
