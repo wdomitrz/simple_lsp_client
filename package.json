@@ -2,13 +2,11 @@
   "name": "simple-lsp-client",
   "displayName": "Simple LSP Client",
   "description": "Run configured stdio LSP servers and stdin/stdout formatters.",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "publisher": "wdomitrz",
   "license": "AGPL-3.0-only",
   "homepage": "https://github.com/wdomitrz/simple_lsp_client#readme",
-  "bugs": {
-    "url": "https://github.com/wdomitrz/simple_lsp_client/issues"
-  },
+  "bugs": { "url": "https://github.com/wdomitrz/simple_lsp_client/issues" },
   "keywords": [
     "lsp",
     "language-server",
@@ -25,25 +23,11 @@
     "type": "git",
     "url": "git+ssh://git@github.com/wdomitrz/simple_lsp_client.git"
   },
-  "engines": {
-    "vscode": "^1.100.0"
-  },
-  "categories": [
-    "Programming Languages",
-    "Formatters",
-    "Linters",
-    "Other"
-  ],
-  "galleryBanner": {
-    "color": "#1f2937",
-    "theme": "dark"
-  },
-  "extensionKind": [
-    "workspace"
-  ],
-  "activationEvents": [
-    "onLanguage"
-  ],
+  "engines": { "vscode": "^1.100.0" },
+  "categories": ["Programming Languages", "Formatters", "Linters", "Other"],
+  "galleryBanner": { "color": "#1f2937", "theme": "dark" },
+  "extensionKind": ["workspace"],
+  "activationEvents": ["onLanguage"],
   "contributes": {
     "commands": [
       {
@@ -76,35 +60,24 @@
           "markdownDescription": "Named LSP servers to start. Each key is a server name.",
           "additionalProperties": {
             "type": "object",
-            "required": [
-              "cmd",
-              "filetypes"
-            ],
+            "required": ["cmd", "filetypes"],
             "additionalProperties": false,
             "properties": {
               "cmd": {
                 "type": "array",
                 "minItems": 1,
-                "items": {
-                  "type": "string",
-                  "minLength": 1
-                },
+                "items": { "type": "string", "minLength": 1 },
                 "markdownDescription": "Command and arguments used to start the LSP server over stdio. Supports `${workspaceFolder}`, `${workspaceFolderBasename}`, `${cwd}`, `${userHome}`, `${pathSeparator}`, and `${execPath}` placeholders."
               },
               "filetypes": {
                 "type": "array",
                 "minItems": 1,
-                "items": {
-                  "type": "string",
-                  "minLength": 1
-                },
+                "items": { "type": "string", "minLength": 1 },
                 "markdownDescription": "VS Code language IDs this LSP server should attach to."
               },
               "env": {
                 "type": "object",
-                "additionalProperties": {
-                  "type": "string"
-                },
+                "additionalProperties": { "type": "string" },
                 "markdownDescription": "Environment variables to add or override for the server process. Values support `${workspaceFolder}`, `${workspaceFolderBasename}`, `${cwd}`, `${userHome}`, `${pathSeparator}`, and `${execPath}` placeholders."
               },
               "initializationOptions": {
@@ -121,17 +94,7 @@
             }
           },
           "examples": [
-            {
-              "ruff": {
-                "cmd": [
-                  "ruff",
-                  "server"
-                ],
-                "filetypes": [
-                  "python"
-                ]
-              }
-            }
+            { "ruff": { "cmd": ["ruff", "server"], "filetypes": ["python"] } }
           ]
         },
         "simpleLspClient.formatters": {
@@ -140,35 +103,24 @@
           "markdownDescription": "Named stdin/stdout formatters to register. Each key is a formatter name.",
           "additionalProperties": {
             "type": "object",
-            "required": [
-              "cmd",
-              "filetypes"
-            ],
+            "required": ["cmd", "filetypes"],
             "additionalProperties": false,
             "properties": {
               "cmd": {
                 "type": "array",
                 "minItems": 1,
-                "items": {
-                  "type": "string",
-                  "minLength": 1
-                },
+                "items": { "type": "string", "minLength": 1 },
                 "markdownDescription": "Command and arguments used to format stdin into stdout. Supports `${workspaceFolder}`, `${workspaceFolderBasename}`, `${cwd}`, `${userHome}`, `${pathSeparator}`, `${execPath}`, `${file}`, `${relativeFile}`, and `${filetype}` placeholders."
               },
               "filetypes": {
                 "type": "array",
                 "minItems": 1,
-                "items": {
-                  "type": "string",
-                  "minLength": 1
-                },
+                "items": { "type": "string", "minLength": 1 },
                 "markdownDescription": "VS Code language IDs this formatter should attach to."
               },
               "env": {
                 "type": "object",
-                "additionalProperties": {
-                  "type": "string"
-                },
+                "additionalProperties": { "type": "string" },
                 "markdownDescription": "Environment variables to add or override for the formatter process. Values support `${workspaceFolder}`, `${workspaceFolderBasename}`, `${cwd}`, `${userHome}`, `${pathSeparator}`, `${execPath}`, `${file}`, `${relativeFile}`, and `${filetype}` placeholders."
               }
             }
@@ -176,15 +128,8 @@
           "examples": [
             {
               "prettier": {
-                "cmd": [
-                  "prettier",
-                  "--stdin-filepath",
-                  "${file}"
-                ],
-                "filetypes": [
-                  "javascript",
-                  "typescript"
-                ]
+                "cmd": ["prettier", "--stdin-filepath", "${file}"],
+                "filetypes": ["javascript", "typescript"]
               }
             }
           ]
@@ -221,7 +166,5 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.4"
   },
-  "dependencies": {
-    "vscode-languageclient": "^9.0.1"
-  }
+  "dependencies": { "vscode-languageclient": "^9.0.1" }
 }
